@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- English, portrait -->
+    <color name="text_color">#1E88E5</color> <!-- blue -->
+    <color name="bg_color">#A35697</color> 
+</resources>

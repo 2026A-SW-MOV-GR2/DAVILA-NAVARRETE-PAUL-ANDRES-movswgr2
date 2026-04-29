@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- English, landscape -->
+    <string name="app_name">t_clase02</string>
+    <string name="app_text">Hello (EN - Landscape)</string>
+</resources>

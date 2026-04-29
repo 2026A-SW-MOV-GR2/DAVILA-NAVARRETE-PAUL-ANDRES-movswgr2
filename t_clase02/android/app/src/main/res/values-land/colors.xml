@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spanish, landscape: inverted theme -->
+    <color name="text_color">#FFFFFF</color>
+    <color name="bg_color">#FF5722</color>
+</resources>

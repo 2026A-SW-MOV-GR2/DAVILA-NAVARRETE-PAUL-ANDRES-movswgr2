@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default: Spanish, portrait -->
+    <color name="text_color">#000000</color>
+    <color name="bg_color">#FFFFFF</color>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- English, landscape -->
+    <color name="text_color">#A35697</color>
+    <color name="bg_color">#C8E6C9</color> <!-- light green -->
+</resources>
