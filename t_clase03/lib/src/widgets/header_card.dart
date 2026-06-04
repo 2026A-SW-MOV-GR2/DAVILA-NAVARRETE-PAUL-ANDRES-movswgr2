@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 
 class HeaderCard extends StatelessWidget {
-  const HeaderCard({required this.totalItems, required this.onCreate, super.key});
+  const HeaderCard({
+    required this.totalItems,
+    required this.onCreate,
+    required this.databaseLabel,
+    required this.databaseColor,
+    super.key,
+  });
 
   final int totalItems;
   final VoidCallback onCreate;
+  final String databaseLabel;
+  final Color databaseColor;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +63,7 @@ class HeaderCard extends StatelessWidget {
                   children: [
                     _StatPill(label: 'Cómics', value: '$totalItems'),
                     const _StatPill(label: 'Tienda', value: 'Activa'),
+                    _ModePill(label: databaseLabel, color: databaseColor),
                   ],
                 ),
               ],
@@ -103,6 +112,32 @@ class _StatPill extends StatelessWidget {
                 ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ModePill extends StatelessWidget {
+  const _ModePill({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withOpacity(0.24)),
+      ),
+      child: Text(
+        'Base actual: $label',
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
       ),
     );
   }
