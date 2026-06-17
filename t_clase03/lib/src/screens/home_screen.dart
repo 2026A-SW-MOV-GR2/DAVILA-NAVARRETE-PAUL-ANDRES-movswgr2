@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../crud_form.dart';
 import '../data/database_mode.dart';
 import '../data/database_provider.dart';
+import '../intents/intent_service.dart';
+import '../intents/intents_screen.dart';
 import '../models.dart';
 import '../native_feedback.dart';
 import '../network/network_screen.dart';
@@ -20,6 +24,39 @@ class CrudHomePage extends StatefulWidget {
 }
 
 class _CrudHomePageState extends State<CrudHomePage> {
+  StreamSubscription<Map<String, dynamic>>? _intentSub;
+
+  @override
+  void initState() {
+    super.initState();
+    IntentService.instance.init();
+
+    // Navegar a Entrantes si la app ya estaba abierta y llega un compartir
+    _intentSub = IntentService.instance.stream.listen((_) {
+      if (mounted) _goToIncoming();
+    });
+
+    // Verificar si la app fue abierta directamente desde un "Compartir"
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final data = await IntentService.instance.fetchInitial();
+      if (data != null && mounted) _goToIncoming();
+    });
+  }
+
+  @override
+  void dispose() {
+    _intentSub?.cancel();
+    super.dispose();
+  }
+
+  void _goToIncoming() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const IntentsScreen(initialTab: 1),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<CrudController>();
@@ -38,6 +75,11 @@ class _CrudHomePageState extends State<CrudHomePage> {
             icon: const Icon(Icons.key_outlined),
             tooltip: 'SecretStorageScreen',
           ),
+          IconButton(
+            onPressed: _openIntentsScreen,
+            icon: const Icon(Icons.swap_horiz_outlined),
+            tooltip: 'Intents',
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: Row(
@@ -46,18 +88,23 @@ class _CrudHomePageState extends State<CrudHomePage> {
                 Text(
                   'SQL',
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: controller.currentMode == DatabaseMode.sql ? Colors.black87 : Colors.black45,
+                        color: controller.currentMode == DatabaseMode.sql
+                            ? Colors.black87
+                            : Colors.black45,
                         fontWeight: FontWeight.w700,
                       ),
                 ),
                 Switch(
                   value: controller.currentMode == DatabaseMode.nosql,
-                  onChanged: (value) => context.read<DatabaseProvider>().toggleMode(value),
+                  onChanged: (value) =>
+                      context.read<DatabaseProvider>().toggleMode(value),
                 ),
                 Text(
                   'NoSQL',
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: controller.currentMode == DatabaseMode.nosql ? Colors.black87 : Colors.black45,
+                        color: controller.currentMode == DatabaseMode.nosql
+                            ? Colors.black87
+                            : Colors.black45,
                         fontWeight: FontWeight.w700,
                       ),
                 ),
@@ -99,7 +146,8 @@ class _CrudHomePageState extends State<CrudHomePage> {
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
                 sliver: SliverList.separated(
                   itemCount: controller.items.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 16),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
                   itemBuilder: (context, index) {
                     final item = controller.items[index];
                     return ItemCard(
@@ -127,19 +175,16 @@ class _CrudHomePageState extends State<CrudHomePage> {
       MaterialPageRoute(builder: (_) => CrudFormPage(item: existing)),
     );
 
-    if (result == null) {
-      return;
-    }
+    if (result == null) return;
 
     final controller = context.read<CrudController>();
     await controller.saveItem(result.item, isEditing: result.isEditing);
 
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
 
     final message = result.isEditing ? 'Cómic actualizado' : 'Cómic añadido';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _confirmDelete(CrudItem item) async {
@@ -161,9 +206,7 @@ class _CrudHomePageState extends State<CrudHomePage> {
       ),
     );
 
-    if (shouldDelete != true) {
-      return;
-    }
+    if (shouldDelete != true) return;
 
     final controller = context.read<CrudController>();
     await controller.deleteItem(item);
@@ -172,7 +215,8 @@ class _CrudHomePageState extends State<CrudHomePage> {
     if (Theme.of(context).platform == TargetPlatform.android) {
       await NativeFeedback.showToast(msg);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(msg)));
     }
   }
 
@@ -185,6 +229,12 @@ class _CrudHomePageState extends State<CrudHomePage> {
   Future<void> _openSecretStorageScreen() {
     return Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const SecretStorageScreen()),
+    );
+  }
+
+  Future<void> _openIntentsScreen() {
+    return Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const IntentsScreen()),
     );
   }
 }
